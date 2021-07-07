@@ -3,7 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.copyDirectory = copyDirectory;
+exports.readFile = readFile;
+exports.getAllFiles = getAllFiles;
 
 var _fs = _interopRequireDefault(require("fs"));
 
@@ -11,22 +12,16 @@ var _path = _interopRequireDefault(require("path"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function mkdir(dirPath) {
-  console.log(_path.default.dirname(dirPath));
-
-  if (!_fs.default.existsSync(dirPath)) {
-    mkdir(_path.default.dirname(dirPath));
-
-    _fs.default.mkdirSync(dirPath);
-  }
+function readFile(file) {
+  return _fs.default.readFileSync(file);
 }
 
-function copyDirectory(src, dest) {
-  if (!_fs.default.existsSync(src)) {
-    return false;
-  }
+function getAllFiles(src) {
+  let files = [];
 
-  mkdir(dest);
+  if (!_fs.default.existsSync(src)) {
+    return files;
+  }
 
   const dirs = _fs.default.readdirSync(src);
 
@@ -36,10 +31,10 @@ function copyDirectory(src, dest) {
     const stat = _fs.default.statSync(dirPath);
 
     if (stat.isFile()) {
-      _fs.default.copyFileSync(dirPath, _path.default.join(dest, item));
+      files.push(dirPath);
     } else if (stat.isDirectory()) {
-      copyDirectory(dirPath, _path.default.join(dest, item));
+      files.push(...getAllFiles(dirPath));
     }
   });
-  return true;
+  return files;
 }

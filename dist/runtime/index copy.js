@@ -5,11 +5,11 @@ function loadJs(jsUrl) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
 
-    script.onload = function () {
+    script.onload = () => {
       resolve(true);
     };
 
-    script.onerror = function (err) {
+    script.onerror = err => {
       reject(err);
     };
 
@@ -18,15 +18,14 @@ function loadJs(jsUrl) {
   });
 }
 
-;
-
 function loadModel(jsUrl, jsonUrl) {
   return {
-    load: function (el, options) {
-      var load = !!window.UnityLoader || loadJs(jsUrl);
-      return Promise.resolve(load).then(function () {
-        return UnityLoader.instantiate(el, jsonUrl, options);
-      });
+    load: async function (el, options) {
+      if (!window.UnityLoader) {
+        await loadJs(jsUrl);
+      }
+
+      return UnityLoader.instantiate(el, jsonUrl, options);
     }
   };
 }
